@@ -56,11 +56,16 @@ module DataShift
 
           if(data.to_s.include?(multi_assoc_delim))
 
+            record.save_if_new
+
             # Check if we processed Option Types and assign  per option
             values = data.to_s.split(multi_assoc_delim)
 
             if(record.variants.size == values.size)
-              record.variants.each_with_index {|v, i| v.price = values[i].to_f }
+              record.variants.each_with_index do |v, i|
+                v.price = values[i].to_f
+                v.save
+              end
               record.save
             else
               puts "WARNING: Price entries did not match number of Variants - None Set"
@@ -71,11 +76,16 @@ module DataShift
 
           if(data.to_s.include?(multi_assoc_delim))
 
+            product_load_object.save_if_new
+
             # Check if we processed Option Types and assign  per option
             values = data.to_s.split(multi_assoc_delim)
 
             if(product_load_object.variants.size == values.size)
-              product_load_object.variants.each_with_index {|v, i| v.cost_price = values[i].to_f }
+              product_load_object.variants.each_with_index do |v, i|
+                v.cost_price = values[i].to_f
+                v.save
+              end
               product_load_object.save
             else
               puts "WARNING: Cost Price entries did not match number of Variants - None Set"
@@ -86,12 +96,17 @@ module DataShift
 
           if(data.to_s.include?(multi_assoc_delim))
 
+            product_load_object.save_if_new
+
             # Check if we processed Option Types and assign  per option
             values = data.to_s.split(multi_assoc_delim)
 
             if(product_load_object.variants.size == values.size)
-              product_load_object.variants.each_with_index {|v, i| v.sku = values[i].to_s }
-              product_load_object.save
+              product_load_object.variants.each_with_index do |v, i| 
+                logger.info("Updating variant SKU #{values[i].to_s}")
+                v.sku = values[i].to_s
+                v.save
+              end
             else
               puts "WARNING: SKU entries did not match number of Variants - None Set"
             end
@@ -249,7 +264,7 @@ module DataShift
               i = product_load_object.variants.size + 1
 
               product_load_object.variants.create!(
-                :sku => "#{product_load_object.sku}_#{i}",
+                # :sku => "#{product_load_object.sku}_#{i}", # do not assign default
                 :price => product_load_object.price,
                 :weight => product_load_object.weight,
                 :height => product_load_object.height,
