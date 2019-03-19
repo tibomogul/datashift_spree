@@ -1,4 +1,4 @@
-require 'rake'
+# require 'rake'
 
 Gem::Specification.new do |s|
   s.platform = Gem::Platform::RUBY
@@ -10,14 +10,22 @@ Gem::Specification.new do |s|
   s.description = "Comprehensive Excel/CSV import/export for Spree, Products,Images, any model with full associations"
   s.email = "rubygems@autotelik.co.uk"
   
-  s.files = FileList["datashift_spree.thor", 
-    "README.markdown",
-    "datashift_spree.gemspec",
-    'VERSION', 
-    "LICENSE.txt", 
-    "{lib}/**/*"].exclude("rdoc").exclude("nbproject").exclude("fixtures").exclude(".log").exclude(".contrib").to_a
+  tmp_str = Dir.glob("{lib}/**/*")
+  tmp_str |= ["datashift_spree.thor", 
+        "README.markdown",
+        "datashift_spree.gemspec",
+        'VERSION', 
+        "LICENSE.txt"]
+
+  ignore_fn = ["rdoc", "nbproject", "fixtures", ".log", ".contrib" ]
   
-  s.test_files = FileList["{spec}/*"]
+  ignore_fn.each do |ignore|
+    tmp_str.reject! {|fn| File.fnmatch?(ignore, fn)}
+  end
+
+  s.files = tmp_str.to_a
+  
+  s.test_files = Dir.glob(["{spec}/*"])
   
   s.homepage = "http://github.com/autotelik/datashift_spree"
   s.licenses = ["MIT"]
